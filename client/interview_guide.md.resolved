@@ -1,0 +1,126 @@
+# Project Interview Guide: Accessibility Analyzer
+
+This comprehensive guide covers every concept, technology, and workflow used in the Accessibility Analyzer project. Use this to prepare for interviews by understanding specifically *how* and *why* this application works.
+
+## 1. Project Overview
+**Elevator Pitch:** "I built a full-stack automated accessibility analysis tool. It takes a website URL, runs a real-time audit using Google Lighthouse, and uses the Gemini AI API to generate actionable, context-aware suggestions for fixing issues. It features a custom glassmorphism UI, detailed data visualization, and historical tracking of reports."
+
+## 2. Technology Stack
+Everything used to build this application.
+
+### Frontend (Client)
+*   **React.js (v18):** Core UI library. Uses Functional Components and Hooks (`useState`, `useEffect`).
+*   **Vite:** Build tool and development server. Chosen for speed over Create-React-App.
+*   **Vanilla CSS (CSS3):** Custom styling without a framework like Bootstrap or Tailwind.
+    *   **Concepts Used:** CSS Variables (`:root`), Flexbox, Grid, Glassmorphism (backdrop-filter), Animations (`@keyframes`), Responsive Design (Media Queries).
+*   **Axios:** HTTP client for making asynchronous requests to the backend.
+*   **Chart.js / react-chartjs-2:** Library for rendering the donut charts (accessibility scores).
+*   **Framer Motion:** For smooth UI transitions and animations.
+
+### Backend (Server)
+*   **Node.js:** Runtime environment.
+*   **Express.js:** Web framework for handling API routes, middleware, and request/response cycles.
+*   **MongoDB:** NoSQL database for storing audit reports.
+*   **Mongoose:** ODM (Object Data Modeling) library to interact with MongoDB (Schemas, Models).
+*   **Lighthouse:** The core engine used programmatically to audit websites.
+*   **Puppeteer (chrome-launcher):** Used to launch a headless Chrome configuration for Lighthouse to run on.
+*   **Google Gemini API (`@google/generative-ai`):** AI model used to interpret technical audit data and generate human-readable fixes.
+*   **Dotenv:** Environment variable management (API keys, DB URIs).
+*   **Cors:** Middleware to allow the frontend (running on a different port) to communicate with the backend.
+
+## 3. Architecture & Concepts "Inch by Inch"
+
+### A. Client-Server Architecture (REST API)
+The app follows a decoupled architecture. The frontend runs on port 5173 (standard Vite) and the backend on port 5000. They communicate via HTTP JSON APIs.
+
+### B. Service Layer Pattern
+Instead of putting all logic in routes, the backend uses a **Service Layer**:
+*   [routes/analyze.routes.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/routes/analyze.routes.js): Handles HTTP request/response.
+*   [services/lighthouse.service.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/services/lighthouse.service.js): Contains specific logic for running Chrome and parsing results.
+*   [services/ai.service.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/services/ai.service.js): Logic for communicating with Google Gemini.
+**Why?** Separation of Concerns. If you switch from Gemini to OpenAI later, you only change [ai.service.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/services/ai.service.js).
+
+### C. The "Glassmorphism" Design
+The UI uses a modern design trend called Glassmorphism.
+*   **Key Concept:** Translucent backgrounds (`rgba(255, 255, 255, 0.05)`) paired with `backdrop-filter: blur(20px)`.
+*   **Effect:** Creates a frosted glass look that feels premium and layered.
+
+### D. Asynchronous Architecture
+This project is heavy on async operations.
+*   **Lighthouse Analysis:** Takes 5-15 seconds.
+*   **AI Generation:** Takes 2-5 seconds.
+*   **Handling:** The frontend uses loading states (`isLoading`) to show spinners while `await`ing the backend response.
+
+## 4. API Endpoints
+These are the contracts between your frontend and backend.
+
+| Method | Endpoint | Description | Payload/Params |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/analyze` | Triggers audit & AI generation | `{ "url": "https://example.com" }` |
+| **GET** | `/api/reports` | Fetches history list | Query: `?limit=20` |
+| **GET** | `/api/reports/:id` | Fetches single report details | URL Param: `id` |
+| **DELETE** | `/api/reports/:id`| Deletes a report | URL Param: `id` |
+| **GET** | `/health` | Server status check | None |
+
+## 5. Step-by-Step Application Workflow
+
+### Step 1: User Request
+1.  User types a URL in the frontend input (e.g., `google.com`).
+2.  Frontend (`Hero.jsx`) validates the input string.
+3.  Frontend calls `axios.post('http://localhost:5000/api/analyze', { url })`.
+4.  Frontend sets `loading` state to `true` (showing spinner).
+
+### Step 2: Backend Processing (The "Heavy Lifting")
+1.  **Route Handler:** [analyze.routes.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/routes/analyze.routes.js) receives the request.
+2.  **Lighthouse Service:**
+    *   Launches a "Headless" Chrome browser (invisible to user).
+    *   Navigates to the URL.
+    *   Runs standard accessibility audits (ARIA labels, contrast, html structure).
+    *   Returns a raw JSON object (LHR - Lighthouse Result).
+    *   Service parses this into simplified scores (0-100) and an issue list.
+3.  **AI Service:**
+    *   Constructs a text prompt: *"The site [URL] has score [X]. Issues are: [List]. Give 5 actionable fixes."*
+    *   Sends prompt to Gemini Pro API.
+    *   Parses the text response into a clean list of suggestions.
+    *   **Fallback:** If AI fails or API key is missing, it falls back to hardcoded [getBasicSuggestions](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/services/ai.service.js#81-132) logic.
+
+### Step 3: Persistence
+1.  A new [Report](file:///d:/Resume%20Projects/AccessibilityAnalyzer/client/src/App.jsx#26-30) document is created using the Mongoose model.
+2.  Data (URL, Scores, Issues, AI Suggestions, Timestamp) is saved to MongoDB.
+
+### Step 4: Response & Render
+1.  Backend sends the saved Report object back to Client.
+2.  Client receives response, sets `loading` to `false`.
+3.  [App.jsx](file:///d:/Resume%20Projects/AccessibilityAnalyzer/client/src/App.jsx) switches view from `'home'` to `'dashboard'`.
+4.  `Dashboard.jsx` renders:
+    *   Donut charts (Chart.js) for the 4 metrics.
+    *   List of issues categorized by severity (Critical/Serious).
+    *   AI Suggestions card.
+
+## 6. Detailed Code Walkthrough (For Interview Explanations)
+
+### The AI Integration ([server/services/ai.service.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/services/ai.service.js))
+*   **Concept:** Prompt Engineering.
+*   **Code logic:** You don't just dump data to AI. You format it: *"You are an accessibility expert..."*. This functionality acts as a "RAG-lite" (Retrieval Augmented Generation) where you contextually provide the tool output (Lighthouse results) to the LLM.
+
+### The Auditing Engine ([server/services/lighthouse.service.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/services/lighthouse.service.js))
+*   **Concept:** Programmatic Browser Control.
+*   **Key Detail:** You aren't just scraping HTML. You are rendering the page including JavaScript to catch accessibility issues that only appear after page load (Client-side rendering issues).
+
+### The Database Schema ([server/models/Report.js](file:///d:/Resume%20Projects/AccessibilityAnalyzer/server/models/Report.js))
+*   **Concept:** Document-Oriented Data.
+*   **Structure:** You store the *entire report* as a single document. This is better than SQL for this case because the "Issues" array varies wildly in size and structure.
+
+## 7. Potential Interview Questions
+
+**Q: Why separate Lighthouse and AI services?**
+*   **A:** To keep the code modular. Lighthouse handles data *collection*, AI handles data *interpretation*. I can easily swap out the AI model or the auditing tool without breaking the other.
+
+**Q: How do you handle long running requests?**
+*   **A:** Currently, I use `await` which keeps the connection open. For production at scale, I would switch to a **Queue System** (like BullMQ or Redis). The user would get a "Job ID" and the frontend would poll for status, preventing timeouts on slow sites.
+
+**Q: Why use Mongoose instead of the native MongoDB driver?**
+*   **A:** Mongoose provides structure (Schemas) and validation out of the box. It ensures that every Report saved has the required fields (URL, score) before it even touches the database.
+
+**Q: How is the frontend state managed?**
+*   **A:** I used simple React local state (`useState`) and "Lifted State Up" to the [App.jsx](file:///d:/Resume%20Projects/AccessibilityAnalyzer/client/src/App.jsx) component to share data between the Search, Dashboard, and History views. Redux would be overkill for this scope.
