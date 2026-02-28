@@ -28,9 +28,9 @@ const connectDB = async () => {
         await mongoose.connect(process.env.MONGODB_URI, {
             // These options are no longer needed in Mongoose 6+
         });
-        console.log('✅ MongoDB connected successfully');
+        console.log(' MongoDB connected successfully');
     } catch (error) {
-        console.error('❌ MongoDB connection error:', error);
+        console.error(' MongoDB connection error:', error);
         process.exit(1);
     }
 };
@@ -65,10 +65,10 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📊 API available at http://localhost:${PORT}/api`);
-    console.log(`💾 MongoDB URI: ${process.env.MONGODB_URI}`);
-    console.log(`🤖 AI Service: ${process.env.GEMINI_API_KEY ? 'Enabled' : 'Disabled (using fallback)'}`);
+    console.log(` Server running on http://localhost:${PORT}`);
+    console.log(` API available at http://localhost:${PORT}/api`);
+    console.log(` MongoDB URI: ${process.env.MONGODB_URI}`);
+    console.log(` AI Service: ${process.env.GEMINI_API_KEY ? 'Enabled' : 'Disabled (using fallback)'}`);
 });
 
 export default app;
