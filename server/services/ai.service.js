@@ -21,9 +21,9 @@ class AIService {
     }
 
     async generateSuggestions(url, issues, score) {
-        // If AI is not available, return basic suggestions
+        // If AI is not available, return an explicit service unavailable message
         if (!this.model) {
-            return this.getBasicSuggestions(issues, score);
+            return ["AI suggestions unavailable. Please check your Gemini API key."];
         }
 
         try {
@@ -36,7 +36,7 @@ class AIService {
             return this.parseSuggestions(text);
         } catch (error) {
             console.error('AI suggestion generation failed:', error);
-            return this.getBasicSuggestions(issues, score);
+            return ["AI suggestions unavailable due to an error. Please check your console or try again later."];
         }
     }
 
@@ -78,57 +78,7 @@ Format your response as a numbered list of suggestions.`;
         return suggestions.length > 0 ? suggestions : [text];
     }
 
-    getBasicSuggestions(issues, score) {
-        const suggestions = [];
 
-        // Score-based suggestions
-        if (score < 50) {
-            suggestions.push('Critical: Your accessibility score is very low. Prioritize fixing color contrast issues and missing alt text immediately.');
-        } else if (score < 75) {
-            suggestions.push('Important: Focus on addressing serious accessibility violations to reach WCAG AA compliance.');
-        }
-
-        // Issue-based suggestions
-        const hasCritical = issues.some(i => i.severity === 'critical');
-        if (hasCritical) {
-            suggestions.push('Fix all critical issues first - these prevent users from accessing your content.');
-        }
-
-        const categories = issues.reduce((acc, issue) => {
-            acc[issue.category] = (acc[issue.category] || 0) + 1;
-            return acc;
-        }, {});
-
-        if (categories.colorContrast > 0) {
-            suggestions.push('Improve color contrast ratios to at least 4.5:1 for normal text and 3:1 for large text (WCAG AA standard).');
-        }
-
-        if (categories.images > 0) {
-            suggestions.push('Add descriptive alt text to all images. Decorative images should have empty alt attributes (alt="").');
-        }
-
-        if (categories.ariaAttributes > 0) {
-            suggestions.push('Review and fix ARIA attributes. Ensure all ARIA roles have required attributes and valid values.');
-        }
-
-        if (categories.formLabels > 0) {
-            suggestions.push('Associate all form inputs with explicit <label> elements using the "for" attribute.');
-        }
-
-        if (categories.keyboardNavigation > 0) {
-            suggestions.push('Ensure all interactive elements are keyboard accessible. Test navigation using only Tab, Enter, and arrow keys.');
-        }
-
-        if (categories.semanticHTML > 0) {
-            suggestions.push('Use semantic HTML5 elements (<header>, <nav>, <main>, <article>) to improve document structure.');
-        }
-
-        // General suggestions
-        suggestions.push('Test your site with screen readers like NVDA (Windows) or VoiceOver (Mac/iOS).');
-        suggestions.push('Consider implementing skip navigation links for keyboard users.');
-
-        return suggestions.slice(0, 7);
-    }
 }
 
 export default new AIService();

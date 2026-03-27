@@ -14,7 +14,6 @@ const Hero = ({ onAnalysisComplete, loading, setLoading }) => {
             return;
         }
 
-        // Validate URL format
         try {
             new URL(url);
         } catch {
@@ -40,7 +39,7 @@ const Hero = ({ onAnalysisComplete, loading, setLoading }) => {
                 <div className="hero-content fade-in">
                     <h1 className="hero-title">
                         Make the Web
-                        <span className="text-gradient"> Accessible</span>
+                        <span className="hero-highlight"> Accessible</span>
                     </h1>
                     <p className="hero-subtitle">
                         Analyze any website for accessibility issues and get AI-powered suggestions
@@ -71,28 +70,21 @@ const Hero = ({ onAnalysisComplete, loading, setLoading }) => {
                                     Analyzing...
                                 </>
                             ) : (
-                                <>
-                                    <span>🔍</span>
-                                    Analyze Accessibility
-                                </>
+                                'Analyze Accessibility'
                             )}
                         </button>
                     </form>
 
-                    {/* Features */}
                     <div className="features grid grid-3 mt-3">
                         <div className="feature-card glass-card">
-                            <div className="feature-icon">🎨</div>
                             <h3>Color Contrast</h3>
                             <p>Check color contrast ratios for readability</p>
                         </div>
                         <div className="feature-card glass-card">
-                            <div className="feature-icon">⌨️</div>
                             <h3>Keyboard Navigation</h3>
                             <p>Ensure full keyboard accessibility</p>
                         </div>
                         <div className="feature-card glass-card">
-                            <div className="feature-icon">🤖</div>
                             <h3>AI Suggestions</h3>
                             <p>Get smart recommendations to fix issues</p>
                         </div>
@@ -106,74 +98,62 @@ const Hero = ({ onAnalysisComplete, loading, setLoading }) => {
           display: flex;
           align-items: center;
           padding: var(--spacing-xl) 0;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .hero::before {
-          content: '';
-          position: absolute;
-          top: -50%;
-          right: -20%;
-          width: 800px;
-          height: 800px;
-          background: radial-gradient(circle, rgba(102, 126, 234, 0.15), transparent);
-          border-radius: 50%;
-          pointer-events: none;
         }
 
         .hero-content {
-          position: relative;
-          z-index: 1;
           text-align: center;
-          max-width: 900px;
+          max-width: 720px;
           margin: 0 auto;
         }
 
         .hero-title {
-          font-size: 4rem;
+          font-size: 2.75rem;
           margin-bottom: var(--spacing-md);
-          font-weight: 800;
+          font-weight: 700;
+        }
+
+        .hero-highlight {
+          color: var(--primary);
         }
 
         .hero-subtitle {
-          font-size: 1.25rem;
+          font-size: 1.125rem;
           color: var(--text-secondary);
           margin-bottom: var(--spacing-xl);
-          max-width: 700px;
+          max-width: 600px;
           margin-left: auto;
           margin-right: auto;
         }
 
         .url-form {
-          max-width: 700px;
+          max-width: 560px;
           margin: 0 auto var(--spacing-xl);
         }
 
         .url-input {
-          font-size: 1.1rem;
-          padding: var(--spacing-md) var(--spacing-lg);
+          font-size: 1rem;
+          padding: 0.875rem 1.25rem;
         }
 
         .btn-analyze {
           width: 100%;
-          padding: var(--spacing-md);
-          font-size: 1.1rem;
+          padding: 0.875rem;
+          font-size: 1rem;
           margin-top: var(--spacing-sm);
         }
 
         .spinner-small {
-          width: 20px;
-          height: 20px;
-          border: 3px solid rgba(255, 255, 255, 0.3);
+          width: 18px;
+          height: 18px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
           border-top-color: white;
           border-radius: 50%;
-          animation: spin 1s linear infinite;
+          animation: spin 0.8s linear infinite;
         }
 
         .error-message {
           color: var(--danger);
-          font-size: 0.9rem;
+          font-size: 0.875rem;
           margin-top: var(--spacing-xs);
           text-align: left;
         }
@@ -185,35 +165,26 @@ const Hero = ({ onAnalysisComplete, loading, setLoading }) => {
         .feature-card {
           text-align: center;
           padding: var(--spacing-lg);
-          transition: var(--transition-normal);
-        }
-
-        .feature-card:hover {
-          transform: translateY(-8px);
-        }
-
-        .feature-icon {
-          font-size: 3rem;
-          margin-bottom: var(--spacing-sm);
         }
 
         .feature-card h3 {
-          font-size: 1.25rem;
+          font-size: 1.125rem;
           margin-bottom: var(--spacing-xs);
         }
 
         .feature-card p {
-          font-size: 0.95rem;
+          font-size: 0.875rem;
           color: var(--text-muted);
+          margin-bottom: 0;
         }
 
         @media (max-width: 768px) {
           .hero-title {
-            font-size: 2.5rem;
+            font-size: 2rem;
           }
 
           .hero-subtitle {
-            font-size: 1.1rem;
+            font-size: 1rem;
           }
 
           .features {

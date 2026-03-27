@@ -84,7 +84,6 @@ const History = ({ onViewReport }) => {
 
                 {reports.length === 0 ? (
                     <div className="empty-state glass-card">
-                        <span className="empty-icon">📊</span>
                         <h3>No Reports Yet</h3>
                         <p>Start analyzing websites to see your reports here</p>
                     </div>
@@ -94,7 +93,7 @@ const History = ({ onViewReport }) => {
                             <div
                                 key={report._id}
                                 className="report-card glass-card fade-in"
-                                style={{ animationDelay: `${index * 0.05}s` }}
+                                style={{ animationDelay: `${index * 0.03}s` }}
                                 onClick={() => onViewReport(report)}
                             >
                                 <div className="report-header">
@@ -106,7 +105,7 @@ const History = ({ onViewReport }) => {
                                         onClick={(e) => handleDelete(report._id, e)}
                                         title="Delete report"
                                     >
-                                        🗑️
+                                        ×
                                     </button>
                                 </div>
 
@@ -134,7 +133,6 @@ const History = ({ onViewReport }) => {
                                 </div>
 
                                 <div className="report-date">
-                                    <span className="date-icon">🕒</span>
                                     {formatDate(report.analyzedAt)}
                                 </div>
                             </div>
@@ -150,17 +148,16 @@ const History = ({ onViewReport }) => {
         }
 
         .history-header {
-          text-align: center;
           margin-bottom: var(--spacing-xl);
         }
 
         .history-header h1 {
-          font-size: 3rem;
-          margin-bottom: var(--spacing-sm);
+          font-size: 2.25rem;
+          margin-bottom: var(--spacing-xs);
         }
 
         .history-subtitle {
-          font-size: 1.2rem;
+          font-size: 1rem;
           color: var(--text-muted);
         }
 
@@ -174,41 +171,34 @@ const History = ({ onViewReport }) => {
         }
 
         .error-banner {
-          background: var(--gradient-danger);
+          background: var(--danger);
           color: white;
-          padding: var(--spacing-md);
+          padding: var(--spacing-sm) var(--spacing-md);
           border-radius: var(--radius-md);
           text-align: center;
           margin-bottom: var(--spacing-lg);
+          font-size: 0.875rem;
         }
 
         .empty-state {
           text-align: center;
           padding: var(--spacing-xl);
-          max-width: 500px;
+          max-width: 400px;
           margin: 0 auto;
-        }
-
-        .empty-icon {
-          font-size: 4rem;
-          display: block;
-          margin-bottom: var(--spacing-md);
         }
 
         .reports-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
           gap: var(--spacing-lg);
         }
 
         .report-card {
           padding: var(--spacing-lg);
           cursor: pointer;
-          transition: var(--transition-normal);
         }
 
         .report-card:hover {
-          transform: translateY(-8px);
           border-color: var(--primary);
         }
 
@@ -220,58 +210,65 @@ const History = ({ onViewReport }) => {
         }
 
         .report-score {
-          width: 70px;
-          height: 70px;
+          width: 56px;
+          height: 56px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.5rem;
-          font-weight: 800;
-          border: 4px solid;
+          font-size: 1.25rem;
+          font-weight: 700;
+          border: 3px solid;
         }
 
         .score-excellent {
           color: var(--accent);
           border-color: var(--accent);
-          background: rgba(16, 185, 129, 0.1);
+          background: rgba(22, 163, 74, 0.08);
         }
 
         .score-good {
           color: var(--primary);
           border-color: var(--primary);
-          background: rgba(102, 126, 234, 0.1);
+          background: rgba(37, 99, 235, 0.08);
         }
 
         .score-fair {
           color: var(--warning);
           border-color: var(--warning);
-          background: rgba(245, 158, 11, 0.1);
+          background: rgba(217, 119, 6, 0.08);
         }
 
         .score-poor {
           color: var(--danger);
           border-color: var(--danger);
-          background: rgba(239, 68, 68, 0.1);
+          background: rgba(220, 38, 38, 0.08);
         }
 
         .delete-btn {
           background: none;
-          border: none;
-          font-size: 1.5rem;
+          border: 1px solid var(--border-color);
+          font-size: 1.25rem;
           cursor: pointer;
-          opacity: 0.6;
+          color: var(--text-muted);
+          width: 32px;
+          height: 32px;
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           transition: var(--transition-fast);
-          padding: var(--spacing-xs);
+          line-height: 1;
         }
 
         .delete-btn:hover {
-          opacity: 1;
-          transform: scale(1.2);
+          border-color: var(--danger);
+          color: var(--danger);
+          background: rgba(220, 38, 38, 0.06);
         }
 
         .report-url {
-          font-size: 1.1rem;
+          font-size: 1rem;
           margin-bottom: var(--spacing-md);
           color: var(--text-primary);
           overflow: hidden;
@@ -282,11 +279,11 @@ const History = ({ onViewReport }) => {
         .report-stats {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: var(--spacing-md);
+          gap: var(--spacing-sm);
           margin-bottom: var(--spacing-md);
-          padding: var(--spacing-md);
-          background: var(--bg-secondary);
-          border-radius: var(--radius-sm);
+          padding: var(--spacing-sm);
+          background: var(--bg-tertiary);
+          border-radius: var(--radius-md);
         }
 
         .stat-item {
@@ -295,15 +292,18 @@ const History = ({ onViewReport }) => {
 
         .stat-label {
           display: block;
-          font-size: 0.8rem;
+          font-size: 0.6875rem;
           color: var(--text-muted);
-          margin-bottom: var(--spacing-xs);
+          margin-bottom: 2px;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          font-weight: 500;
         }
 
         .stat-value {
           display: block;
-          font-size: 1.3rem;
-          font-weight: 700;
+          font-size: 1.125rem;
+          font-weight: 600;
           color: var(--text-primary);
         }
 
@@ -312,15 +312,8 @@ const History = ({ onViewReport }) => {
         }
 
         .report-date {
-          display: flex;
-          align-items: center;
-          gap: var(--spacing-xs);
           color: var(--text-muted);
-          font-size: 0.9rem;
-        }
-
-        .date-icon {
-          font-size: 1rem;
+          font-size: 0.8125rem;
         }
 
         @media (max-width: 768px) {
@@ -329,7 +322,7 @@ const History = ({ onViewReport }) => {
           }
 
           .history-header h1 {
-            font-size: 2rem;
+            font-size: 1.75rem;
           }
         }
       `}</style>

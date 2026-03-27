@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './index.css';
 import Hero from './components/Hero';
 import Dashboard from './components/Dashboard';
 import History from './components/History';
 
 function App() {
-  const [view, setView] = useState('home'); // 'home', 'dashboard', 'history'
+  const [view, setView] = useState('home');
   const [currentReport, setCurrentReport] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   const handleAnalysisComplete = (report) => {
     setCurrentReport(report);
@@ -30,14 +39,19 @@ function App() {
 
   return (
     <div className="app">
-      {/* Navigation */}
       <nav className="nav">
         <div className="container flex-between">
           <div className="logo">
-            <span className="logo-icon">♿</span>
-            <span className="logo-text">A11y Analyzer</span>
+            <span className="logo-text">Accessibility Analyzer</span>
           </div>
           <div className="nav-links">
+            <button
+              className="nav-link"
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? 'Dark' : 'Light'}
+            </button>
             <button
               className={`nav-link ${view === 'home' ? 'active' : ''}`}
               onClick={handleBackToHome}
@@ -54,7 +68,6 @@ function App() {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main>
         {view === 'home' && (
           <Hero
@@ -68,6 +81,7 @@ function App() {
           <Dashboard
             report={currentReport}
             onBack={handleBackToHome}
+            theme={theme}
           />
         )}
 
@@ -78,11 +92,10 @@ function App() {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="container text-center">
           <p className="text-muted">
-            Built with ❤️ for accessibility • Powered by Lighthouse & AI
+            © 2026 Accessibility Analyzer · Powered by Lighthouse
           </p>
         </div>
       </footer>

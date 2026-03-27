@@ -16,8 +16,19 @@ import { Doughnut, Bar } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, ChartDataLabels);
 
-const Dashboard = ({ report, onBack }) => {
+const Dashboard = ({ report, onBack, theme }) => {
   const { score, performanceScore, bestPracticesScore, seoScore, issues, totalIssues, categories, suggestions, url } = report;
+
+  const isDark = theme === 'dark';
+  const textColor = isDark ? '#f1f5f9' : '#475569';
+  const tooltipBg = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+  const tooltipTitleColor = isDark ? '#f1f5f9' : '#1e293b';
+  const tooltipBodyColor = isDark ? '#cbd5e1' : '#475569';
+  const tooltipBorderColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
+  const borderColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0, 0, 0, 0.08)';
+  const labelShadowColor = isDark ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.3)';
+  const tickColor = isDark ? '#94a3b8' : '#64748b';
 
   // Severity chart data
   const severityValues = [
@@ -33,20 +44,20 @@ const Dashboard = ({ report, onBack }) => {
     datasets: [{
       data: severityValues,
       backgroundColor: [
-        'rgba(239, 68, 68, 0.9)',
-        'rgba(245, 158, 11, 0.9)',
-        'rgba(59, 130, 246, 0.9)',
-        'rgba(16, 185, 129, 0.9)'
+        '#dc2626',
+        '#d97706',
+        '#2563eb',
+        '#16a34a'
       ],
       borderColor: [
-        '#ef4444',
-        '#f59e0b',
-        '#3b82f6',
-        '#10b981'
+        isDark ? '#dc2626' : '#ffffff',
+        isDark ? '#d97706' : '#ffffff',
+        isDark ? '#2563eb' : '#ffffff',
+        isDark ? '#16a34a' : '#ffffff'
       ],
-      borderWidth: 3,
-      hoverOffset: 12,
-      hoverBorderWidth: 4
+      borderWidth: 2,
+      hoverOffset: 6,
+      hoverBorderWidth: 2
     }]
   };
 
@@ -61,7 +72,7 @@ const Dashboard = ({ report, onBack }) => {
         position: 'right',
         align: 'center',
         labels: {
-          color: '#f1f5f9',
+          color: textColor,
           font: { size: 13, weight: '600', family: 'Inter, sans-serif' },
           padding: 16,
           usePointStyle: true,
@@ -85,14 +96,14 @@ const Dashboard = ({ report, onBack }) => {
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        titleColor: '#f1f5f9',
-        bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: tooltipBg,
+        titleColor: tooltipTitleColor,
+        bodyColor: tooltipBodyColor,
+        borderColor: tooltipBorderColor,
         borderWidth: 1,
-        padding: 14,
-        titleFont: { size: 14, weight: 'bold' },
-        bodyFont: { size: 13 },
+        padding: 12,
+        titleFont: { size: 13, weight: 'bold' },
+        bodyFont: { size: 12 },
         callbacks: {
           label: (ctx) => {
             const val = ctx.parsed;
@@ -104,9 +115,9 @@ const Dashboard = ({ report, onBack }) => {
       datalabels: {
         display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
         color: '#ffffff',
-        font: { size: 16, weight: 'bold', family: 'Inter, sans-serif' },
-        textShadowBlur: 8,
-        textShadowColor: 'rgba(0,0,0,0.8)',
+        font: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
+        textShadowBlur: isDark ? 6 : 3,
+        textShadowColor: labelShadowColor,
         formatter: (value) => {
           if (value === 0) return null;
           const pct = severityTotal > 0 ? Math.round((value / severityTotal) * 100) : 0;
@@ -116,14 +127,14 @@ const Dashboard = ({ report, onBack }) => {
     }
   };
 
-  // Category chart data — each bar gets its own distinct color
+  // Category chart data
   const categoryColors = [
-    { bg: 'rgba(168, 85, 247, 0.85)', border: '#a855f7' },
-    { bg: 'rgba(59, 130, 246, 0.85)', border: '#3b82f6' },
-    { bg: 'rgba(34, 197, 94, 0.85)', border: '#22c55e' },
-    { bg: 'rgba(245, 158, 11, 0.85)', border: '#f59e0b' },
-    { bg: 'rgba(239, 68, 68, 0.85)', border: '#ef4444' },
-    { bg: 'rgba(20, 184, 166, 0.85)', border: '#14b8a6' }
+    { bg: isDark ? 'rgba(147, 51, 234, 0.75)' : '#9333ea', border: isDark ? '#9333ea' : '#ffffff' },
+    { bg: isDark ? 'rgba(37, 99, 235, 0.75)' : '#2563eb', border: isDark ? '#2563eb' : '#ffffff' },
+    { bg: isDark ? 'rgba(22, 163, 74, 0.75)' : '#16a34a', border: isDark ? '#16a34a' : '#ffffff' },
+    { bg: isDark ? 'rgba(217, 119, 6, 0.75)' : '#d97706', border: isDark ? '#d97706' : '#ffffff' },
+    { bg: isDark ? 'rgba(220, 38, 38, 0.75)' : '#dc2626', border: isDark ? '#dc2626' : '#ffffff' },
+    { bg: isDark ? 'rgba(13, 148, 136, 0.75)' : '#0d9488', border: isDark ? '#0d9488' : '#ffffff' }
   ];
 
   const categoryValues = [
@@ -142,11 +153,9 @@ const Dashboard = ({ report, onBack }) => {
       data: categoryValues,
       backgroundColor: categoryColors.map(c => c.bg),
       borderColor: categoryColors.map(c => c.border),
-      borderWidth: 2,
-      borderRadius: 8,
-      borderSkipped: false,
-      hoverBorderWidth: 3,
-      hoverBorderColor: '#ffffff'
+      borderWidth: 1,
+      borderRadius: 6,
+      borderSkipped: false
     }]
   };
 
@@ -158,14 +167,14 @@ const Dashboard = ({ report, onBack }) => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        titleColor: '#f1f5f9',
-        bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: tooltipBg,
+        titleColor: tooltipTitleColor,
+        bodyColor: tooltipBodyColor,
+        borderColor: tooltipBorderColor,
         borderWidth: 1,
-        padding: 14,
-        titleFont: { size: 14, weight: 'bold' },
-        bodyFont: { size: 13 },
+        padding: 12,
+        titleFont: { size: 13, weight: 'bold' },
+        bodyFont: { size: 12 },
         callbacks: {
           title: (items) => {
             const rawLabels = ['Color Contrast', 'ARIA', 'Keyboard', 'Semantic HTML', 'Forms', 'Images'];
@@ -181,8 +190,8 @@ const Dashboard = ({ report, onBack }) => {
         anchor: 'end',
         align: 'top',
         offset: 2,
-        color: '#f1f5f9',
-        font: { size: 15, weight: 'bold', family: 'Inter, sans-serif' },
+        color: textColor,
+        font: { size: 13, weight: 'bold', family: 'Inter, sans-serif' },
         formatter: (value) => value > 0 ? value : ''
       }
     },
@@ -190,24 +199,24 @@ const Dashboard = ({ report, onBack }) => {
       y: {
         beginAtZero: true,
         ticks: {
-          color: '#94a3b8',
-          font: { size: 13, family: 'Inter, sans-serif' },
+          color: tickColor,
+          font: { size: 12, family: 'Inter, sans-serif' },
           stepSize: 1,
           precision: 0
         },
-        grid: { color: 'rgba(255, 255, 255, 0.08)' },
-        border: { color: 'rgba(255,255,255,0.15)' }
+        grid: { color: gridColor },
+        border: { color: borderColor }
       },
       x: {
         ticks: {
-          color: '#e2e8f0',
-          font: { size: 13, weight: '700', family: 'Inter, sans-serif' },
+          color: textColor,
+          font: { size: 12, weight: '600', family: 'Inter, sans-serif' },
           maxRotation: 45,
           minRotation: 0,
           autoSkip: false
         },
         grid: { display: false },
-        border: { color: 'rgba(255,255,255,0.15)' }
+        border: { color: borderColor }
       }
     }
   };
@@ -227,7 +236,7 @@ const Dashboard = ({ report, onBack }) => {
         {/* Header */}
         <div className="dashboard-header">
           <button className="btn-back" onClick={onBack}>
-            ← Back to Home
+            ← Back
           </button>
           <div className="url-display">
             <h2>Analysis Report</h2>
@@ -307,9 +316,8 @@ const Dashboard = ({ report, onBack }) => {
               ))
             ) : (
               <div className="no-issues glass-card">
-                <span className="success-icon">✅</span>
-                <h3>No Issues Found!</h3>
-                <p>This website has excellent accessibility!</p>
+                <h3>No Issues Found</h3>
+                <p>This website has excellent accessibility.</p>
               </div>
             )}
           </div>
@@ -327,30 +335,30 @@ const Dashboard = ({ report, onBack }) => {
         }
 
         .btn-back {
-          background: var(--bg-secondary);
+          background: var(--bg-tertiary);
           color: var(--text-primary);
-          padding: var(--spacing-sm) var(--spacing-lg);
+          padding: 0.5rem 1rem;
           border: none;
-          border-radius: var(--radius-full);
+          border-radius: var(--radius-md);
           cursor: pointer;
           transition: var(--transition-fast);
           margin-bottom: var(--spacing-md);
-          font-weight: 600;
+          font-weight: 500;
+          font-size: 0.875rem;
         }
 
         .btn-back:hover {
-          background: var(--bg-tertiary);
-          transform: translateX(-4px);
+          background: var(--border-color);
         }
 
         .url-display h2 {
-          font-size: 2rem;
+          font-size: 1.75rem;
           margin-bottom: var(--spacing-xs);
         }
 
         .analyzed-url {
           color: var(--primary);
-          font-size: 1.1rem;
+          font-size: 0.9375rem;
           word-break: break-all;
         }
 
@@ -363,25 +371,25 @@ const Dashboard = ({ report, onBack }) => {
           display: flex;
           align-items: center;
           gap: var(--spacing-xl);
-          margin-bottom: var(--spacing-xl);
+          margin-bottom: var(--spacing-lg);
           flex-wrap: wrap;
         }
 
         .score-info h3 {
-          font-size: 1.5rem;
+          font-size: 1.25rem;
           margin-bottom: var(--spacing-xs);
         }
 
         .score-description {
-          font-size: 1.1rem;
+          font-size: 1rem;
         }
 
         .other-scores {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
           gap: var(--spacing-lg);
           padding-top: var(--spacing-lg);
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          border-top: 1px solid var(--border-color);
         }
 
         .score-item {
@@ -390,12 +398,12 @@ const Dashboard = ({ report, onBack }) => {
 
         .score-label {
           color: var(--text-muted);
-          font-size: 0.9rem;
-          margin-bottom: var(--spacing-xs);
+          font-size: 0.8125rem;
+          margin-bottom: 4px;
         }
 
         .score-value {
-          font-size: 2rem;
+          font-size: 1.75rem;
           font-weight: 700;
         }
 
@@ -405,9 +413,8 @@ const Dashboard = ({ report, onBack }) => {
 
         .chart-card h3 {
           margin-bottom: var(--spacing-md);
-          font-size: 1.3rem;
-          font-weight: 700;
-          letter-spacing: 0.01em;
+          font-size: 1.125rem;
+          font-weight: 600;
         }
 
         .chart-card {
@@ -415,15 +422,14 @@ const Dashboard = ({ report, onBack }) => {
         }
 
         .chart-container {
-          height: 380px;
+          height: 360px;
           position: relative;
-          padding-top: 4px;
         }
 
         .total-issues {
           text-align: center;
           margin-top: var(--spacing-md);
-          font-size: 1.1rem;
+          font-size: 0.9375rem;
           color: var(--text-secondary);
         }
 
@@ -433,23 +439,17 @@ const Dashboard = ({ report, onBack }) => {
 
         .issues-section h2 {
           margin-bottom: var(--spacing-lg);
-          font-size: 2rem;
+          font-size: 1.75rem;
         }
 
         .issues-grid {
           display: grid;
-          gap: var(--spacing-md);
+          gap: var(--spacing-sm);
         }
 
         .no-issues {
           text-align: center;
           padding: var(--spacing-xl);
-        }
-
-        .success-icon {
-          font-size: 4rem;
-          display: block;
-          margin-bottom: var(--spacing-md);
         }
 
         @media (max-width: 768px) {
