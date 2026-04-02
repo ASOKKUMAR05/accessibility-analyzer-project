@@ -1,33 +1,19 @@
-import lighthouse from 'lighthouse';
-import * as chromeLauncher from 'chrome-launcher';
-import puppeteer from 'puppeteer';
+import axios from 'axios';
 
 class LighthouseService {
     async analyzeURL(url) {
-        let chrome;
         try {
-            // Launch Chrome
-            chrome = await chromeLauncher.launch({
-                chromePath: puppeteer.executablePath(),
-                chromeFlags: ['--headless', '--disable-gpu', '--no-sandbox']
-            });
+            console.log(`Analyzing via Google PageSpeed API: ${url}`);
+            // Call Google PageSpeed Insights API
+            const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=accessibility&category=performance&category=best-practices&category=seo`;
+            const response = await axios.get(apiUrl);
 
-            // Run Lighthouse
-            const options = {
-                logLevel: 'error',
-                output: 'json',
-                onlyCategories: ['accessibility', 'performance', 'best-practices', 'seo'],
-                port: chrome.port
-            };
-
-            const runnerResult = await lighthouse(url, options);
-
-            // Extract accessibility data
-            const { lhr } = runnerResult;
-            const accessibilityCategory = lhr.categories.accessibility;
-            const performanceCategory = lhr.categories.performance;
-            const bestPracticesCategory = lhr.categories['best-practices'];
-            const seoCategory = lhr.categories.seo;
+            // Extract accessibility data exactly how local Lighthouse returns it
+            const { lighthouseResult: lhr } = response.data;
+            const accessibilityCategory = lhr.categories.accessibility || { score: 0, auditRefs: [] };
+            const performanceCategory = lhr.categories.performance || { score: 0 };
+            const bestPracticesCategory = lhr.categories['best-practices'] || { score: 0 };
+            const seoCategory = lhr.categories.seo || { score: 0 };
 
             // Parse issues
             const issues = this.parseIssues(lhr.audits, accessibilityCategory);
@@ -36,21 +22,17 @@ class LighthouseService {
 
             return {
                 url,
-                score: Math.round(accessibilityCategory.score * 100),
-                performanceScore: Math.round(performanceCategory.score * 100),
-                bestPracticesScore: Math.round(bestPracticesCategory.score * 100),
-                seoScore: Math.round(seoCategory.score * 100),
+                score: Math.round((accessibilityCategory.score || 0) * 100),
+                performanceScore: Math.round((performanceCategory.score || 0) * 100),
+                bestPracticesScore: Math.round((bestPracticesCategory.score || 0) * 100),
+                seoScore: Math.round((seoCategory.score || 0) * 100),
                 issues,
                 totalIssues: severityCounts,
                 categories: categorizedIssues
             };
         } catch (error) {
-            console.error('Lighthouse analysis error:', error);
-            throw new Error(`Failed to analyze URL: ${error.message}`);
-        } finally {
-            if (chrome) {
-                await chrome.kill();
-            }
+            console.error('PageSpeed API error:', error.response?.data || error.message);
+            throw new Error(`Failed to analyze URL: ${error.response?.data?.error?.message || error.message}`);
         }
     }
 
