@@ -5,7 +5,8 @@ class LighthouseService {
         try {
             console.log(`Analyzing via Google PageSpeed API: ${url}`);
             // Call Google PageSpeed Insights API
-            const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=accessibility&category=performance&category=best-practices&category=seo`;
+            const apiKey = process.env.PAGESPEED_API_KEY;
+            const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=accessibility&category=performance&category=best-practices&category=seo${apiKey ? `&key=${apiKey}` : ''}`;
             const response = await axios.get(apiUrl);
 
             // Extract accessibility data exactly how local Lighthouse returns it
