@@ -2,11 +2,12 @@ import express from 'express';
 import lighthouseService from '../services/lighthouse.service.js';
 import aiService from '../services/ai.service.js';
 import Report from '../models/Report.js';
+import { protect } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 // Analyze a URL
-router.post('/analyze', async (req, res) => {
+router.post('/analyze', protect, async (req, res) => {
     try {
         const { url } = req.body;
 
@@ -36,7 +37,8 @@ router.post('/analyze', async (req, res) => {
         // Save report to database
         const report = new Report({
             ...analysisResult,
-            suggestions
+            suggestions,
+            userId: req.user._id
         });
 
         await report.save();
@@ -67,13 +69,12 @@ router.post('/analyze', async (req, res) => {
 });
 
 // Get all reports
-router.get('/reports', async (req, res) => {
+router.get('/reports', protect, async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 20;
-        const reports = await Report.find()
+        const reports = await Report.find({ userId: req.user._id })
             .sort({ analyzedAt: -1 })
-            .limit(limit)
-            .select('-issues'); // Exclude detailed issues for list view
+            .limit(limit);
 
         res.json({
             success: true,
@@ -89,9 +90,9 @@ router.get('/reports', async (req, res) => {
 });
 
 // Get a specific report
-router.get('/reports/:id', async (req, res) => {
+router.get('/reports/:id', protect, async (req, res) => {
     try {
-        const report = await Report.findById(req.params.id);
+        const report = await Report.findOne({ _id: req.params.id, userId: req.user._id });
 
         if (!report) {
             return res.status(404).json({ error: 'Report not found' });
@@ -111,9 +112,9 @@ router.get('/reports/:id', async (req, res) => {
 });
 
 // Delete a report
-router.delete('/reports/:id', async (req, res) => {
+router.delete('/reports/:id', protect, async (req, res) => {
     try {
-        const report = await Report.findByIdAndDelete(req.params.id);
+        const report = await Report.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
 
         if (!report) {
             return res.status(404).json({ error: 'Report not found' });

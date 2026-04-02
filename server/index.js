@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import analyzeRoutes from './routes/analyze.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import aiService from './services/ai.service.js';
 
 // Load environment variables
@@ -38,6 +39,7 @@ const connectDB = async () => {
 connectDB();
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api', analyzeRoutes);
 
 // Health check endpoint

@@ -9,6 +9,17 @@ const api = axios.create({
     },
 });
 
+// Request interceptor to add token
+api.interceptors.request.use((config) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.token) {
+        config.headers.Authorization = `Bearer ${user.token}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
 export const analyzeURL = async (url) => {
     try {
         const response = await api.post('/analyze', { url });
@@ -42,6 +53,34 @@ export const deleteReport = async (id) => {
         return response.data;
     } catch (error) {
         throw error.response?.data || error.message;
+    }
+};
+
+// Auth API Calls
+export const loginUser = async (email, password) => {
+    try {
+        const response = await api.post('/auth/login', { email, password });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { error: 'An error occurred during login' };
+    }
+};
+
+export const registerUser = async (name, email, password) => {
+    try {
+        const response = await api.post('/auth/register', { name, email, password });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { error: 'An error occurred during registration' };
+    }
+};
+
+export const getCurrentUser = async () => {
+    try {
+        const response = await api.get('/auth/me');
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { error: 'An error occurred fetching user' };
     }
 };
 
