@@ -32,9 +32,22 @@ function App() {
     setView('history');
   };
 
-  const handleViewReport = (report) => {
-    setCurrentReport(report);
-    setView('dashboard');
+  const handleViewReport = async (report) => {
+    try {
+      setLoading(true);
+      // Fetch full report to get the 'issues' array which is omitted from the history list payload
+      const { getReport } = await import('./services/api');
+      const response = await getReport(report._id);
+      setCurrentReport(response.report);
+      setView('dashboard');
+    } catch (error) {
+      console.error('Failed to load full report', error);
+      // Fallback to the partial report if fetching the full one fails
+      setCurrentReport(report);
+      setView('dashboard');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
