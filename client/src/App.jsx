@@ -89,9 +89,27 @@ function App() {
               >
                 History
               </button>
-              <button className="nav-link" onClick={logout}>
-                Logout
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '8px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'var(--accent-cyan, #0ea5e9)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  textTransform: 'uppercase',
+                  boxShadow: 'var(--shadow-sm)'
+                }}>
+                  {user?.name ? user.name.charAt(0) : 'U'}
+                </div>
+                <button className="nav-link" onClick={logout}>
+                  Logout
+                </button>
+              </div>
             </div>
           ) : (
             <div className="nav-links">

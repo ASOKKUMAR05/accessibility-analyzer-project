@@ -95,7 +95,6 @@ export default function Signup() {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="John Doe"
                             required
                             style={{
                                 width: "100%",
@@ -125,7 +124,6 @@ export default function Signup() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
                             required
                             style={{
                                 width: "100%",
@@ -155,7 +153,6 @@ export default function Signup() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Min. 6 characters"
                             required
                             style={{
                                 width: "100%",
@@ -185,7 +182,6 @@ export default function Signup() {
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm your password"
                             required
                             style={{
                                 width: "100%",
