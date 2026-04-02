@@ -7,7 +7,25 @@ class LighthouseService {
             // Call Google PageSpeed Insights API
             const apiKey = process.env.PAGESPEED_API_KEY;
             const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&category=accessibility&category=performance&category=best-practices&category=seo${apiKey ? `&key=${apiKey}` : ''}`;
-            const response = await axios.get(apiUrl);
+
+            let response;
+            try {
+                response = await axios.get(apiUrl);
+            } catch (axiosError) {
+                const status = axiosError.response?.status;
+                const responseData = axiosError.response?.data;
+
+                // PageSpeed API returns an HTML page for 429 rate-limit errors
+                if (status === 429 || (typeof responseData === 'string' && responseData.includes('automated queries'))) {
+                    throw new Error(
+                        'Google PageSpeed API rate limit reached. Please wait a moment and try again, or add a PAGESPEED_API_KEY environment variable to increase your quota.'
+                    );
+                }
+
+                // Surface structured JSON error messages when available
+                const jsonMessage = typeof responseData === 'object' ? responseData?.error?.message : null;
+                throw new Error(jsonMessage || axiosError.message);
+            }
 
             // Extract accessibility data exactly how local Lighthouse returns it
             const { lighthouseResult: lhr } = response.data;
@@ -32,8 +50,8 @@ class LighthouseService {
                 categories: categorizedIssues
             };
         } catch (error) {
-            console.error('PageSpeed API error:', error.response?.data || error.message);
-            throw new Error(`Failed to analyze URL: ${error.response?.data?.error?.message || error.message}`);
+            console.error('PageSpeed API error:', error.message);
+            throw new Error(`Failed to analyze URL: ${error.message}`);
         }
     }
 
