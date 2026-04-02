@@ -8,6 +8,7 @@ class LighthouseService {
         try {
             // Launch Chrome
             chrome = await chromeLauncher.launch({
+                chromePath: puppeteer.executablePath(),
                 chromeFlags: ['--headless', '--disable-gpu', '--no-sandbox']
             });
 
